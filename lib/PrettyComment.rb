@@ -131,7 +131,8 @@ class Box
 #----------------------------------------------------------------------------------------------------------------------#  
 
   def to_s
-    PrettyComment::separator(top) + @linebuffer.join("\n") + PrettyComment::separator(bottom)
+    newline = "\n"
+    PrettyComment::separator(top) + newline + @linebuffer.join("\n") + newline + PrettyComment::separator(bottom)
   end
 
 #----------------------------------------------------------------------------------------------------------------------#  
