@@ -16,8 +16,8 @@ end
 
 #----------------------------------------------------------------------------------------------------------------------#
 
-def self.separator(char='=')
-  '#' + (char * (terminal_width - 2)) + '#'
+def self.separator(char='=', left='#', right='#')
+  left + (char * (terminal_width - left.length - right.length)) + right
 end  
 
 
@@ -73,6 +73,7 @@ def self.format_line(text, prefix, only_first_line_prefix=false, suffix='', alte
   result.join("\n")
 end
 
+
 #----------------------------------------------------------------------------------------------------------------------#  
 
 def self.heading(a_text, a_delimiter = '=')
@@ -124,7 +125,37 @@ class Box
 #----------------------------------------------------------------------------------------------------------------------#  
 
   def hline(a_char = @top)
-    @linebuffer << PrettyComment.separator(a_char)
+    @linebuffer << PrettyComment.separator(a_char, left, right)
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def heading(a_string, a_char)
+    @linebuffer << PrettyComment.separator(a_char, left, right) 
+    @linebuffer << PrettyComment::format_line(a_string, left, false, right)
+    @linebuffer << PrettyComment.separator(a_char, left, right) 
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def h1(a_string)
+    heading(a_string, "#")
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def h2(a_string)
+    heading(a_string, "=")
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def h3(a_string)
+    heading(a_string, "-")
   end
 
 
