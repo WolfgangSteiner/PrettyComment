@@ -1,6 +1,8 @@
+require './lib/version.rb'
+
 Gem::Specification.new do |s|
   s.name        = 'PrettyComment'
-  s.version     = '0.1.1'
+  s.version     = PrettyComment::VERSION
   s.date        = Time.new.to_s[0,10]
   s.summary     = "Nice formatting of comments."
   s.description = "Formatting of status messages and comments for terminal output."
