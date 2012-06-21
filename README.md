@@ -28,8 +28,30 @@ will result in:
 #=============================================================#
 
 #-------------------------------------------------------------#
-# Wheter 'tis nobler in the mind                              #
+# Whether 'tis nobler in the mind                             #
 #-------------------------------------------------------------#
+```
+
+### Text Formatting:
+
+```
+Prefix = "Summary:"
+PrefixOnlyFirstLine = true
+puts PrettyComment.format_line(Summary, Prefix, PrefixOnlyFirstLine)
+```
+
+will result in:
+
+```
+Summary: The play is set in Denmark at the Castle Elsinore. The King Hamlet     
+         has just died and his brother, Claudius, has replaced him and also     
+         married his dead brother's wife, Gertrude. In the second scene of ACT  
+         I, Claudius addresses the court on his recent marriage to Gertrude,    
+         on political matters and also gives his blessings to Laertes, the son  
+         of the Lord Chamberlain Polonius, who is about to leave for France.    
+         He then turns to Hamlet, who is still mourning his father and doesn't  
+         seem to get over it. Even if it's natural to mourn his father's        
+         death, he argues, he should get over it.  
 ```
 
 
