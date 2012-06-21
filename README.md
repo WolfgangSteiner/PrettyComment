@@ -175,6 +175,7 @@ will result in:
 |##############################################################################/
 ```
 
+
 Currently the following styles are implemented:
  * default for terminal, ruby, python etc.
  * c++
