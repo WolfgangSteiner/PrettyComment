@@ -174,3 +174,17 @@ will result in:
 | This is a free-form box.                                                     /
 |##############################################################################/
 ```
+
+Currently the following styles are implemented:
+ * default for terminal, ruby, python etc.
+ * c++
+ * latex
+ 
+Styles can also be set globally on the Box class:
+
+```
+PrettyComment::Box::style = 'c++'
+PrettyComment::Box::width = 120
+PrettyComment::Box::left = '#'
+etc.
+```
