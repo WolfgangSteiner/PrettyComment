@@ -5,9 +5,35 @@ require 'terminfo'
 #======================================================================================================================#
 
 module PrettyComment
-
-
+@@width = TermInfo.screen_size[1]
+@@styles = {
+  'default' => { :left => '#',  :right => '#' }, 
+  'c++'     => { :left => '//', :right => '//'},
+  'latex'   => { :left => '%',  :right => '%'} 
+}
+  
 #======================================================================================================================#
+
+def self.width
+  @@width
+end
+
+
+#----------------------------------------------------------------------------------------------------------------------#
+
+def self.width=(a_width)
+  @@width = a_width
+end
+
+
+#----------------------------------------------------------------------------------------------------------------------#
+
+def self.styles
+  @@styles
+end
+
+
+#----------------------------------------------------------------------------------------------------------------------#
 
 def self.terminal_width
   TermInfo.screen_size[1]
@@ -16,8 +42,8 @@ end
 
 #----------------------------------------------------------------------------------------------------------------------#
 
-def self.separator(char='=', left='#', right='#')
-  left + (char * (terminal_width - left.length - right.length)) + right
+def self.separator(char='=', left='#', right='#', width=@@width)
+  left + (char * (width - left.length - right.length)) + right
 end  
 
 
@@ -31,7 +57,7 @@ end
 #----------------------------------------------------------------------------------------------------------------------#
 
 def self.comment(comment)
-  pad_string("\# #{comment}", "#", terminal_width)
+  pad_string("\# #{comment}", "#", width)
 end
 
 
@@ -51,9 +77,9 @@ end
 
 #----------------------------------------------------------------------------------------------------------------------#  
   
-def self.format_line(text, prefix, only_first_line_prefix=false, suffix='', alternate_prefix='')
+def self.format_line(text, prefix, only_first_line_prefix=false, suffix='', alternate_prefix='', width=@@width)
   the_suffix = suffix.length ? " " + suffix : ""
-  text_width = terminal_width - 1 - the_suffix.length
+  text_width = width - 1 - the_suffix.length
   title_array = text.split(" ")
   result = []
   current_line = prefix.dup
@@ -64,12 +90,12 @@ def self.format_line(text, prefix, only_first_line_prefix=false, suffix='', alte
   
   title_array.each do |w|
     (current_line.length + w.length + 1 > text_width) \
-      && result << pad_string(current_line, suffix, terminal_width) \
+      && result << pad_string(current_line, suffix, width) \
       && current_line = current_prefix.dup
     current_line << " " << w
   end
   
-  current_line.length > current_prefix.length && result << pad_string(current_line, suffix, terminal_width)
+  current_line.length > current_prefix.length && result << pad_string(current_line, suffix, width)
   result.join("\n")
 end
 
@@ -105,11 +131,20 @@ end
 #----------------------------------------------------------------------------------------------------------------------#  
 
 class Box
-  attr_accessor :left, :right, :top, :bottom
+  class << self
+    attr_accessor :right, :top, :bottom, :width
+  end
+  @@left = @@right = '#'
+  @@top = @@bottom = '='
+  @@width = PrettyComment::width
+
+  attr_accessor :left, :right, :top, :bottom, :width
   def initialize *a, &b
-    @left = @right = '#'
-    @top = @bottom = '='
-    @width = PrettyComment.terminal_width
+    @left = @@left
+    @right = @@right
+    @top = @@top
+    @bottom = @@bottom
+    @width = @@width
     @linebuffer = []
     cloaker(&b).bind(self).call(*a) if b
   end
@@ -117,8 +152,98 @@ class Box
 
 #----------------------------------------------------------------------------------------------------------------------#  
 
+  def self.left=(a_left)
+    @@left = a_left
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def self.right=(a_right)
+    @@right = a_right
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def self.top=(a_top)
+    @@top = a_top
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def self.bottom=(a_bottom)
+    @@bottom = a_bottom
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def self.width=(a_width)
+    @@width = a_width
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def self.style=(a_style)
+    style = PrettyComment::styles[a_style]
+    
+    @@left = style[:left]
+    @@right = style[:right]
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_style(a_style)
+    style = PrettyComment.styles[a_style]
+    
+    @left = style[:left]
+    @right = style[:right]
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_left(a_left)
+    @left = a_left
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_right(a_right)
+    @right = a_right
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_top(a_top)
+    @top = a_top
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_bottom(a_bottom)
+    @bottom = a_bottom
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def box_width(a_width)
+    @width = a_width
+  end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
   def para(a_string)
-    @linebuffer << PrettyComment::format_line(a_string, left, false, right)
+    @linebuffer << PrettyComment::format_line(a_string, left, false, right, '', width)
   end
 
 
@@ -133,7 +258,7 @@ class Box
 
   def heading(a_string, a_char)
     @linebuffer << PrettyComment.separator(a_char, left, right) 
-    @linebuffer << PrettyComment::format_line(a_string, left, false, right)
+    @linebuffer << PrettyComment::format_line(a_string, left, false, right, '', width)
     @linebuffer << PrettyComment.separator(a_char, left, right) 
   end
 
@@ -163,8 +288,18 @@ class Box
 
   def to_s
     newline = "\n"
-    PrettyComment::separator(top) + newline + @linebuffer.join("\n") + newline + PrettyComment::separator(bottom)
+    result =  PrettyComment::separator(top, left, right, width) << newline
+    result << @linebuffer.join("\n") << newline
+    result << PrettyComment::separator(bottom, left, right, width)
   end
+
+
+#----------------------------------------------------------------------------------------------------------------------#  
+
+  def inspect
+    to_s
+  end
+
 
 #----------------------------------------------------------------------------------------------------------------------#  
 
